@@ -60,10 +60,10 @@
     $(function () {
 
         $.ajaxSetup({
-            beforeSend(xhr) {
+            beforeSend(xhr) {//在登录之前检测token唯一值 给所有的请求都设置请求头（从localStorage中读取token)
                 xhr.setRequestHeader("Authorization", localStorage.getItem('token'))
             },
-            error(xhr, status, error) {
+            error(xhr, status, error) {//发生错误进行拦截
                 console.log(xhr)
                 console.log(status)
                 console.log(error);
@@ -84,10 +84,15 @@
                     // console.log(res);
                     $('.user_info>img').attr('src', res.data.userPic);
                     $('.user_info>span').html('欢迎&nbsp;&nbsp;' + res.data.nickname);
-                    $('.user_center_link>img').attr('src',res.data.userPic)
+                    $('.user_center_link>img').attr('src', res.data.userPic)
                 }
 
             }
+        })
+        $('a.logout').on('click', function () {
+            localStorage.removeItem('token');
+            window.location.href = './login.html'
+            // console.log(this)
         })
 
     })
