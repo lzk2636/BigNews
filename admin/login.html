@@ -88,6 +88,7 @@
             $('#myModal').modal('show') 
             $('#myModal .modal-body').children('p').text(res.msg)
             // alert(res.msg);
+            localStorage.setItem('token',res.token)
             window.location.href='./index.html';
             
           }else{
