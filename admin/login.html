@@ -46,14 +46,15 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
           <h4 class="modal-title">信息提示</h4>
         </div>
         <div class="modal-body">
           <p></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-success" data-dismiss="modal">确认</button>
           <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
         </div>
       </div><!-- /.modal-content -->
@@ -70,31 +71,28 @@
 
       var username = $('.input_txt').val().trim();
       var password = $('.input_pass').val().trim();
-      if(username==''||password==''){
+      if (username == '' || password == '') {
         // alert('用户名和密码不能为空');
-        $('#myModal').modal('show') ;
+        $('#myModal').modal('show');
         $('#myModal .modal-body').children('p').text('用户名和密码不能为空');
         return;
       }
       $.ajax({
         type: 'post',
-        url: bignew.login,
+        url: bignew.user_login,
         data: {
-          username:username,
-          password:password
+          username: username,
+          password: password
         },
         success: function (res) {
-          // console.log(res);
-          if(res.code==200){
-            $('#myModal').modal('show') 
-            $('#myModal .modal-body').children('p').text(res.msg)
-            // alert(res.msg);
-            localStorage.setItem('token',res.token)
-            window.location.href='./index.html';
-            
-          }else{
-            $('#myModal').modal('show') 
-            $('#myModal .modal-body').children('p').text(res.msg)
+          $('#myModal').modal('show')
+          $('#myModal .modal-body').children('p').text(res.msg)
+          if (res.code == 200) {
+            localStorage.setItem('token', res.token);
+            $('#myModal').on('hidden.bs.modal', function (e) {
+              window.location.href = './index.html';
+            })
+
           }
 
         }

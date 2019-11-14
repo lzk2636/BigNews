@@ -63,7 +63,7 @@
     $(function () {
         $.ajax({
             type: 'get',
-            url: bignew.info,
+            url: bignew.user_info,
             data: {
             },
             success: function (res) {
@@ -81,10 +81,8 @@
             window.location.href = './login.html'
             // console.log(this)
         })
-        $()
+        //有二级列表
         $('.level01').eq(1).on('click',function(e){
-            // e.stopPropagation()
-            // console.log('1111')
             $('.level02').slideToggle(500)
         });
         $('.menu>.level01').on('click',function(e){
