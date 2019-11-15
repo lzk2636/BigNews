@@ -43,7 +43,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="javascript:void(0)" class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
+                            <a  class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
                                 data-target="#myModal">新增分类</a>
                         </td>
                     </tr>
@@ -62,6 +62,7 @@
                     <h4 class="modal-title" id="myModalLabel">文章类别增加</h4>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id='id'>
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1"> 名称:</span>
                         <input type="text" class="form-control" id='name' aria-describedby="basic-addon1">
@@ -104,23 +105,29 @@
                 type: 'get',
                 url: bignew.category_list,
                 success: function (res) {
-                    // console.log(res)
+                    console.log(res)
                     var temp = template('category_temp', res)
                     $('tbody').html(temp)
                 }
+            })
+
+            $('#xinzengfenlei').click(function(){
+                $('#id').val('');
             })
 
             //新增分类
             $('.modal-footer>button').on('click', function () {
                 var name = $('#name').val().trim();
                 var slug = $('#slug').val().trim();
-                var
+                var id = $('#id').val();
+                
+                console.log('id=' + id);
                 if (name == '' || slug == '') {
                     alert('名称和slug不能为空');
                     return;
                 }
-                
-                $.ajax({
+                if(id==''){
+                    $.ajax({
                     type: 'post',
                     url: bignew.category_add,
                     data: {
@@ -130,16 +137,33 @@
                     },
                     success: function (res) {
                         var that = res;
+                        console.log(res)
                         $('#myModal').on('hidden.bs.modal', function (e) {
                             // console.log(that)
-                            if (that.code) {
+                            if (that.code==201) {
                                 alert(that.msg);
-                                window.location.reload()
+                                window.location.reload();
                             }
                         })
 
                     }
                 })
+                }else{
+                    $.ajax({
+                        type:	'post',
+                         url:	bignew.category_edit,
+                        data:	{
+                            id:parseInt(id),
+                            name:name,
+                            slug:slug
+                        },
+                        success:	function(res){
+                            alert(res.msg)
+                            window.location.reload();
+                        }
+                        })
+                }
+             
             })
 
             //删除数据
@@ -179,7 +203,8 @@
                     success: function (res) {
                         // console.log(res)
                         $('#name').val(res.data[0].name);
-                        $('#slug').val(res.data[0].slug)
+                        $('#slug').val(res.data[0].slug);
+                        $('#id').val(id)
                     }
                 })
 
@@ -188,7 +213,7 @@
 
 
             //更新数据
-            
+
 
 
 
