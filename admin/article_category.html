@@ -52,4 +52,149 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">文章类别增加</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1"> 名称:</span>
+                        <input type="text" class="form-control" id='name' aria-describedby="basic-addon1">
+                    </div>
+                    <br>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1"> Slug:</span>
+                        <input type="text" class="form-control" id='slug' aria-describedby="basic-addon1">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">确认</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script src="./libs/http.js"></script>
+    <script id='category_temp' type="text/html">
+        {{each data v}}
+        <tr>
+                <td>{{v.name}}</td>
+                <td>{{v.slug}}</td>
+                <td class="text-center">
+                    <a href="javascript:void(0)" data-toggle="modal"  data-id='{{v.id}}' class=" btn btn-info btn-xs">编辑</a>
+                    <a href="javascript:void(0)" data-id='{{v.id}}' class="btn btn-danger btn-xs">删除</a>
+                </td>
+            </tr>
+    {{/each}}
+    </script>
+    <script>
+        $(function () {
+            //初始化数据
+            $.ajax({
+                type: 'get',
+                url: bignew.category_list,
+                success: function (res) {
+                    // console.log(res)
+                    var temp = template('category_temp', res)
+                    $('tbody').html(temp)
+                }
+            })
+
+            //新增分类
+            $('.modal-footer>button').on('click', function () {
+                var name = $('#name').val().trim();
+                var slug = $('#slug').val().trim();
+                var
+                if (name == '' || slug == '') {
+                    alert('名称和slug不能为空');
+                    return;
+                }
+                
+                $.ajax({
+                    type: 'post',
+                    url: bignew.category_add,
+                    data: {
+                        name: name,
+                        slug: slug
+
+                    },
+                    success: function (res) {
+                        var that = res;
+                        $('#myModal').on('hidden.bs.modal', function (e) {
+                            // console.log(that)
+                            if (that.code) {
+                                alert(that.msg);
+                                window.location.reload()
+                            }
+                        })
+
+                    }
+                })
+            })
+
+            //删除数据
+            $('tbody').on('click', '.btn-danger', function () {
+                // console.log(this)
+                var that = this;
+                var id = $(this).attr('data-id')
+                if (confirm('你确定要删除吗?')) {
+
+                    $.ajax({
+                        type: 'post',
+                        url: bignew.category_delete,
+                        data: {
+                            id: parseInt(id)
+                        },
+                        success: function (res) {
+                            console.log(res);
+                            $(that).parent().parent().remove()
+                        }
+                    })
+
+                }
+
+
+            })
+            //编辑数据
+            $('tbody').on('click', '.btn-info', function () {
+                var id = $(this).attr('data-id')
+                console.log(this)
+                $('#myModal').modal('show');
+                $.ajax({
+                    type: 'get',
+                    url: bignew.category_search,
+                    data: {
+                        id: parseInt(id)
+                    },
+                    success: function (res) {
+                        // console.log(res)
+                        $('#name').val(res.data[0].name);
+                        $('#slug').val(res.data[0].slug)
+                    }
+                })
+
+            })
+
+
+
+            //更新数据
+            
+
+
+
+        })
+
+
+    </script>
+
 </html>
