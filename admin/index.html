@@ -82,8 +82,16 @@
             // console.log(this)
         })
         //有二级列表
+        var isok=true;
         $('.level01').eq(1).on('click',function(e){
             $('.level02').slideToggle(500)
+            $('.level02>li').first().addClass('active').siblings().removeClass('active');
+            
+            $(this).find('b').toggleClass('rotate0')
+            //点击dom的点击事件 a标签的href 也会触发
+            $('.level02>li:eq(0)>a')[0].click()
+               
+           
         });
         $('.menu>.level01').on('click',function(e){
             $(this).addClass('active').siblings().removeClass('active')
