@@ -13,6 +13,8 @@
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 引入模板引擎js文件 -->
     <script src="./libs/template-web.js"></script>
+    <!-- 分页插件 -->
+    <script src="./libs/jquery.twbsPagination.js"></script>
 </head>
 
 <body>
@@ -69,10 +71,147 @@
                 </tbody>
             </table>
             <div class="row text-center">
+                <ul id="pagination" class="pagination-sm"></ul>
+
+                <!-- <ul id="alt-style-pagination" class="pagination simple-pagination"><li class="disabled"><span class="current prev"><span aria-hidden="true">«</span></span></li><li class="active"><span class="current">1</span></li><li><a href="#page-2" class="page-link">2</a></li><li><a href="#page-3" class="page-link">3</a></li><li><a href="#page-4" class="page-link">4</a></li><li><a href="#page-5" class="page-link">5</a></li><li class=""><span class="ellipse clickable">…</span></li><li><a href="#page-19" class="page-link">19</a></li><li><a href="#page-20" class="page-link">20</a></li><li><a href="#page-2" class="page-link next"><span aria-hidden="true">»</span></a></li></ul> -->
+
             </div>
         </div>
     </div>
 </body>
+<script src="./libs/http.js"></script>
+<script type="text/html" id='artcle_temp'>
+
+    {{each  data.data v}}
+    <tr>
+        <td>{{v.title}}</td>
+        <td>{{v.author}}</td>
+        <td>{{v.category}}</td>
+        <td class="text-center">{{v.date}}</td>
+        <td class="text-center">{{v.state}}</td>
+        <td class="text-center">
+            <a href="article_edit.html?id={{v.id}}" class="btn btn-default btn-xs">编辑</a>
+            <a  data-id={{v.id}}  class="btn btn-danger btn-xs delete">删除</a>
+        </td>
+    </tr>
+{{/each}}
+
+</script>
+
+<!-- 分类初始化模板 -->
+<script id='category' type="text/html">
+
+
+
+    <select id="selCategory" name="" class="form-control input-sm">
+      
+            <option value="">所有分类</option>
+            {{each data v}}
+            <option value='{{v.id}}'>{{v.name}}</option>
+            {{/each}}
+        </select> 
+
+
+
+</script>
+
+
+<script>
+    $(function () {
+
+        var currentPage = 1;
+
+
+        //初始化数据文章数据
+        $('#btnSearch').on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'get',
+                url: bignew.article_query,
+                data: {
+                    type: $('#selCategory').val(),
+                    state: $('#selStatus').val(),
+                    page: currentPage,
+                    perpage: 10
+                },
+                success: function (res) {
+                    console.log(res)
+                    var temp = template('artcle_temp', res)
+                    $('tbody').html(temp)
+                    showPage(currentPage, res.data.totalPage)//获取页面总页数,设置默认初始化为1
+                }
+            })
+
+        })
+        $('#btnSearch').trigger('click')
+
+
+
+
+        // 初始化分类
+        $.ajax({
+            type: 'get',
+            url: bignew.category_list,
+            success: function (res) {
+                console.log(res)
+                var temp = template('category', res)
+                $('#selCategory').html(temp)
+            }
+        })
+
+
+
+    })
+
+
+
+    //页码端
+    /**
+       * @description:加载分页组件 
+       * @param {type} totalPages ：总页数
+       * @param {type} startPage ：当前页数
+       * @return: 
+       */
+    function showPage(currentPage, totalPages) {
+        $('#pagination').twbsPagination('destroy')
+        $('#pagination').twbsPagination({
+            totalPages: totalPages,
+            startPage: currentPage,
+            visiblePages: 6,
+            first: '首页',
+            prev: '上一页',
+            next: '下一页',
+            last: '尾页',
+            onPageClick: function (evt, page) {
+                console.log('page=' + page);
+                console.log('evt=' + evt);
+                if (page != currentPage) {
+                    currentPage = page;
+                    getList(currentPage)//页面不同重新发起ajax 请求
+                }
+            }
+        })
+    }
+    function getList(currentPage) {
+        $.ajax({
+            type: 'get',
+            url: bignew.article_query,
+            data: {
+                type: $('#selCategory').val(),
+                state: $('#selStatus').val(),
+                page: currentPage,
+                perpage: 10
+            },
+            success: function (res) {
+                var temp = template('artcle_temp', res)
+                $('tbody').html(temp)
+            }
+        })
+    }
+
+</script>
+
+
 
 
 </html>
