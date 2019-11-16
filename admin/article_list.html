@@ -118,7 +118,7 @@
 
 <script>
     $(function () {
-
+        //设置默认初始页
         var currentPage = 1;
 
 
@@ -159,7 +159,28 @@
             }
         })
 
+        //文章删除功能
+        $('tbody').on('click', 'a.btn-xs', function () {
+          var that=this;
+            var id = $(this).attr('data-id');
+            if (confirm('你确认删除文章吗???')) {
+                $.ajax({
+                    type: 'post',
+                    url: bignew.article_delete,
+                    data: {
+                        id: parseInt(id)
+                    },
+                    success: function (res) {
+                        // console.log(res)
+                        if (res.code == 204) {
+                            alert(res.msg)
+                            $(that).parent().parent().remove();
+                        }
+                    }
+                })
+            }
 
+        })
 
     })
 
@@ -183,11 +204,11 @@
             next: '下一页',
             last: '尾页',
             onPageClick: function (evt, page) {
-                console.log('page=' + page);
-                console.log('evt=' + evt);
+                // console.log('page=' + page);
+                // console.log('evt=' + evt);
                 if (page != currentPage) {
                     currentPage = page;
-                    getList(currentPage)//页面不同重新发起ajax 请求
+                    getList(currentPage)//页码不同重新发起ajax 请求
                 }
             }
         })
