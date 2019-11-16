@@ -61,6 +61,8 @@ $(function () {
             }
         })
 ```
+## 2.1 分页工具的难点
++ 学习网站:http://josecebe.github.io/twbs-pagination/#page-1
 
 
 

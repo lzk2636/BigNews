@@ -43,7 +43,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a  class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
+                            <a class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
                                 data-target="#myModal">新增分类</a>
                         </td>
                     </tr>
@@ -59,23 +59,25 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">文章类别增加</h4>
+                    <h4 class="modal-title" id="myModalLabel">类别增加</h4>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id='id'>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1"> 名称:</span>
-                        <input type="text" class="form-control" id='name' aria-describedby="basic-addon1">
-                    </div>
-                    <br>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1"> Slug:</span>
-                        <input type="text" class="form-control" id='slug' aria-describedby="basic-addon1">
-                    </div>
-
+                    <form>
+                        <input type="hidden" id='id'>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1"> 名称:</span>
+                            <input type="text" class="form-control" id='name' aria-describedby="basic-addon1">
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1"> Slug:</span>
+                            <input type="text" class="form-control" id='slug' aria-describedby="basic-addon1">
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-dismiss="modal">确认</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-success btn-queren">确认</button>
 
                 </div>
             </div>
@@ -92,7 +94,7 @@
                 <td>{{v.name}}</td>
                 <td>{{v.slug}}</td>
                 <td class="text-center">
-                    <a href="javascript:void(0)" data-toggle="modal"  data-id='{{v.id}}' class=" btn btn-info btn-xs">编辑</a>
+                    <a href="javascript:void(0)" data-toggle="modal"  data-target="#myModal"  data-id='{{v.id}}' class=" btn btn-info btn-xs">编辑</a>
                     <a href="javascript:void(0)" data-id='{{v.id}}' class="btn btn-danger btn-xs">删除</a>
                 </td>
             </tr>
@@ -101,70 +103,58 @@
     <script>
         $(function () {
             //初始化数据
-            $.ajax({
-                type: 'get',
-                url: bignew.category_list,
-                success: function (res) {
-                    console.log(res)
-                    var temp = template('category_temp', res)
-                    $('tbody').html(temp)
-                }
-            })
+            getData()
 
-            $('#xinzengfenlei').click(function(){
-                $('#id').val('');
-            })
-
-            //新增分类
-            $('.modal-footer>button').on('click', function () {
-                var name = $('#name').val().trim();
-                var slug = $('#slug').val().trim();
-                var id = $('#id').val();
-                
-                console.log('id=' + id);
-                if (name == '' || slug == '') {
-                    alert('名称和slug不能为空');
-                    return;
-                }
-                if(id==''){
-                    $.ajax({
-                    type: 'post',
-                    url: bignew.category_add,
-                    data: {
-                        name: name,
-                        slug: slug
-
-                    },
+            function getData() {
+                $.ajax({
+                    type: 'get',
+                    url: bignew.category_list,
                     success: function (res) {
-                        var that = res;
-                        console.log(res)
-                        $('#myModal').on('hidden.bs.modal', function (e) {
-                            // console.log(that)
-                            if (that.code==201) {
-                                alert(that.msg);
-                                window.location.reload();
-                            }
-                        })
-
+                        // console.log(res)
+                        var temp = template('category_temp', res)
+                        $('tbody').html(temp)
                     }
                 })
-                }else{
-                    $.ajax({
-                        type:	'post',
-                         url:	bignew.category_edit,
-                        data:	{
-                            id:parseInt(id),
-                            name:name,
-                            slug:slug
-                        },
-                        success:	function(res){
-                            alert(res.msg)
-                            window.location.reload();
-                        }
-                        })
+            }
+
+            //新增分类
+            /* 
+            show.bs.modal
+            show 方法调用之后立即触发该事件。
+            如果是通过点击某个作为触发器的元素，
+            则此元素可以通过事件的 relatedTarget 属性进行访问。
+            
+            */
+            $('#myModal').on('show.bs.modal', function (e) {
+                // console.log(e.relatedTarget)
+                if (e.relatedTarget === $('#xinzengfenlei')[0]) {
+                    // alert('新增')
+                    $('#myModalLabel').text($(e.relatedTarget).text());
+                    $('button.btn-queren').addClass('btn-success').removeClass('btn-primary')
+                    $('button.btn-queren').text('新增')
+
+                } else {
+                    $('#myModalLabel').text($(e.relatedTarget).text());
+                    $('button.btn-queren').addClass('btn-primary').removeClass('btn-success')
+                    $('button.btn-queren').text('编辑')
+                    //获取数据到模态框
+                    $('input#id').val($(e.relatedTarget).attr('data-id'))
+                    $('input#name').val($(e.relatedTarget).parent().prev().prev().text());
+                    $('input#slug').val($(e.relatedTarget).parent().prev().text())
+
                 }
-             
+                // do something...
             })
+
+
+
+
+            //关闭按钮
+            $('button.btn-off').on('click', function () {
+                $('form')[0].reset();
+                //表单重置
+            })
+
 
             //删除数据
             $('tbody').on('click', '.btn-danger', function () {
@@ -189,24 +179,56 @@
 
 
             })
-            //编辑数据
-            $('tbody').on('click', '.btn-info', function () {
-                var id = $(this).attr('data-id')
-                console.log(this)
-                $('#myModal').modal('show');
-                $.ajax({
-                    type: 'get',
-                    url: bignew.category_search,
-                    data: {
-                        id: parseInt(id)
-                    },
-                    success: function (res) {
-                        // console.log(res)
-                        $('#name').val(res.data[0].name);
-                        $('#slug').val(res.data[0].slug);
-                        $('#id').val(id)
-                    }
-                })
+            //编辑数据 和 新增事件根据类名判断
+            $('button.btn-queren').on('click', function () {
+                console.log($(this).hasClass('btn-success'))
+                var name = $('#name').val().trim();
+                var slug = $('#slug').val().trim();
+                var id = $('input#id').val();
+                if ($(this).hasClass('btn-success')) {
+                    $.ajax({
+                        type: 'post',
+                        url: bignew.category_add,
+                        data: {
+                            name: name,
+                            slug: slug
+                        },
+                        success: function (res) {
+
+                            // console.log(res)
+                            if (res.code == 201) {
+                                alert(res.msg)
+                                $('#myModal').modal('hide');
+                                $('form')[0].reset()
+                                getData();
+                            }
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: 'post',
+                        url: bignew.category_edit,
+                        data: {
+                            id: parseInt(id),
+                            name: name,
+                            slug: slug
+                        },
+                        success: function (res) {
+                            // if(res.code)
+                            // console.log(res);
+                            if (res.code == 200) {
+                                $('#myModal').modal('hide');
+                                getData();
+                                alert(res.msg);
+                                return;
+                            }
+                            alert(res.msg)
+
+                        }
+                    })
+
+                }
+
 
             })
 
