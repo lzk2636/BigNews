@@ -361,10 +361,13 @@ body{
     text-overflow:ellipsis;
     white-space:nowrap;
 }
+#comment_list{
+    color:#666;
+}
 
 .guanzhu_list li a{
     margin-left:0px;
-    width:220px;
+    /* width:220px; */
 }
 
 .comment_list li{
