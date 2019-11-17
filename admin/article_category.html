@@ -199,7 +199,7 @@
                             if (res.code == 201) {
                                 alert(res.msg)
                                 $('#myModal').modal('hide');
-                                $('form')[0].reset()
+                                 $('form')[0].reset()
                                 getData();
                             }
                         }
@@ -218,6 +218,7 @@
                             // console.log(res);
                             if (res.code == 200) {
                                 $('#myModal').modal('hide');
+                                $('form')[0].reset()
                                 getData();
                                 alert(res.msg);
                                 return;
