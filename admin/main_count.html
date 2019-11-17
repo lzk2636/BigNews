@@ -175,10 +175,10 @@
             legend: {
                 orient: 'horizontal',
                 x: 'center',
-                data: ['爱生活', '趣美味', '爱旅行', '爱电影', '爱游泳'],
+                data: ["爱生活222", "爱旅行", "爱美食", "爱运动", "经济特区", "李主玲4545", "大家电 /生活电器6", "大家电 /生活电器66"],
                 top: 30
             },
-            color: ['#5885e8', '#13cfd5', '#00ce68', '#ff9565', '#20ff19'],
+            color: ["#2f6734", "#0963b5", "#6b71b9", "#a64ccb", "#c31490", "#b20c42", "#f3b50a", "#f2ae0c"],
             series: [
                 {
                     name: '分类名称',
@@ -195,11 +195,19 @@
                         }
                     },
                     data: [
-                        { value: 335, name: '爱生活' },
-                        { value: 310, name: '趣美味' },
-                        { value: 234, name: '爱旅行' },
-                        { value: 135, name: '爱电影' },
-                        { value: 548, name: '爱游泳' }
+                        // { value: 335, name: '爱生活2222222222' },
+                        // { value: 310, name: '趣美味' },
+                        // { value: 234, name: '爱旅行' },
+                        // { value: 135, name: '爱电影' },
+                        // { value: 548, name: '爱游泳' }
+                        { value: 73, name: "爱生活222" },
+                        { value: 34, name: "爱旅行" },
+                        { value: 37, name: "爱美食" },
+                        { value: 50, name: "爱运动" },
+                        { value: 34, name: "经济特区" },
+                        { value: 1, name: "李主玲4545" },
+                        { value: 0, name: "大家电 /生活电器6" },
+                        //  { value: 0, name: "大家电 /生活电器66" }
                     ]
                 }
             ]
@@ -214,17 +222,21 @@
             success: function (res) {
                 console.log(res)
                 option1.legend.data = [];
-                option1.series[0].data = []
+                option1.series[0].data = [];
+                option1.color = [];
                 for (var i = 0; i < res.date.length; i++) {
-                    option1.legend.data.push(res.date[i].name)
-                    option1.series[0].data.push({ vlaue: res.date[i].articles, name: res.date[i].name })
+                    option1.legend.data.push(res.date[i].name);
+                    option1.color.push(getColor());
+                    option1.series[0].data.push({ value: res.date[i].articles, name: res.date[i].name })
                 }
-
-                console.log(option1)
+                myChart1.setOption(option1);
 
             }
+
         })
-        myChart1.setOption(option1);
+        // var p = option1;
+        // console.log(option1)
+
     </script>
     <!-- 柱状图 -->
     <script>
@@ -296,7 +308,7 @@
         };
 
 
-        
+
         $.ajax({
             type: 'get',
             url: bignew.data_category,
@@ -304,38 +316,44 @@
             success: function (res) {
                 console.log(res)
                 option2.legend.data = [];
-                option2.series = []
+                option2.series = [];
+                option2.color = [];
                 for (var i = 0; i < res.date.length; i++) {
-                    option2.legend.data.push(res.date[i].name)
-                    option2.series.push({name: res.date[i].name, type: 'bar' })
+                    option2.legend.data.push(res.date[i].name);
+                    option2.color.push(getColor())
+
+                    option2.series.push({ name: res.date[i].name, type: 'bar' });
                 }
 
                 // console.log(option1)
 
             }
         })
+
+        //访问者的数量
         $.ajax({
             type: 'get',
             url: bignew.data_visit,
             success: function (res) {
-                for(var i=0;i<option2.series.length;i++){
-                    option2.series[i].data=[]
-                   
-                        for (const key in res.data) {
-              
+                for (var i = 0; i < option2.series.length; i++) {
+                    option2.series[i].data = []
+
+                    for (const key in res.data) {
+
                         const element = res.data[key];
-                     
+
                         option2.series[i].data.push(element)
-            
-                }
-                    
-                   
+
+                    }
+
+
                 }
                 // console.log(option2)
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart2.setOption(option2);
             }
         })
-
-        // 使用刚指定的配置项和数据显示图表。
         myChart2.setOption(option2);
     </script>
 
@@ -355,6 +373,15 @@
                 }
             })
         })
+        function getColor() {
+
+            var list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
+            var color = '#'
+            for (var i = 0; i < 6; i++) {
+                color += list[Math.floor(Math.random() * list.length)]
+            }
+            return color;
+        }
 
     </script>
 
