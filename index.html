@@ -15,7 +15,14 @@
     <div class="header">
         <a href="#" class="logo fl"><img src="images/logo.png" alt="logo"></a>
         <div class="search_form fl">
-            <input type="text" class="search_txt" placeholder="黑洞照片">
+            <input type="text" class="search_txt" placeholder="黑洞照片" list="list">
+            <datalist id="list">
+                 <option value="1爱运动"></option>
+                            <!-- <option value="Firefox">
+                            <option value="Chrome">
+                            <option value="Opera">
+                            <option value="Safari"> -->
+            </datalist>
             <button class="search_btn"><i class="fa fa-search"></i></button>
         </div>
         <div class="link_info fr">
@@ -235,7 +242,7 @@
             {{else}}
             <li>
                 {{/if}}
-                <a href="#"><img src="{{v.cover}}" alt=""></a>
+                <a href="./article.html?id={{v.id}}"><img src="{{v.cover}}" alt=""></a>
                 <p>{{v.title}}</p>
             </li>
 
@@ -275,10 +282,10 @@
                 <h4><a href="./article.html?id={{v.id}}">{{v.title}} </a></h4>
                 <p>
                     <!-- 亚马逊抛弃了中国的买家们，却难以割舍庞大的卖家市场，有消息指出亚马逊中国将针对中国庞大的卖家群体推出一项贷款推荐计划。在连续对印度、墨西哥等新兴市场大力推广线上支付服务后，亚马逊金融试水进军中国市场的信号终于被放出。 -->
-                    {{v.intro}}
+                    {{@v.intro}}
                 </p>
                 <div class="new_info">
-                    <span>标签：{{v.type}}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( {{v.read}}
+                    <span>标签：{{v.category}}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( {{v.read}}
                             )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( {{v.comments}} )</span>
                     <b>发布于{{v.date}}</b>
                 </div>
@@ -293,8 +300,8 @@
 
     {{each data v}}
     <li>
-            <span>{{v.author}}</span>
-            <b><em>{{v.author}}</em> {{v.date}}说:</b>
+            <span>{{v.author.substr(0,1)}}</span>
+            <b><em>{{v.author}}</em> {{months-v.date.split('-')[1]}}个月前({{v.date.split('-')[1]}}-{{v.date.split('-')[2]}})说:</b>
             <strong>{{v.intro}}</strong>
         </li>
         {{/each}}
@@ -318,6 +325,9 @@
 {{/each}}
 
 </script>
+
+
+
     <script>
         $(function () {
             // 热点图
@@ -335,7 +345,7 @@
                 url: 'http://localhost:8080/api/v1/index/category',
 
                 success: function (res) {
-                    console.log(res);
+                    //console.log(res);
                     $('.level_two').html(template('category', res))
                 }
             })
@@ -354,6 +364,7 @@
                 type: 'get',
                 url: 'http://localhost:8080/api/v1/index/latest',
                 success: function (res) {
+                    console.log(res)
                     $('.common_news').html(template('common_news', res));
                 }
             })
@@ -364,7 +375,10 @@
                 // data:	{
                 // },
                 success: function (res) {
-                    // console.log(res)
+                    var months=new Date().getMonth()+1;
+                    res.months=months;
+                    //console.log(res)
+
                     $('ul.comment_list').html(template('latest_comment', res))
                 }
             })
@@ -377,7 +391,32 @@
                     $('.guanzhu_list').html(template('attention', res))  //attention
                 }
             })
+            //文章搜索
+            $.ajax({
+                    type: 'get',
+                    url: bignew.category_list,
+                    success: function (res) {
+                        // console.log(res)
+                        var temp = template('category_temp', res)
+                        $('tbody').html(temp)
+                    }
+                })
 
+
+            $('button.search_btn').on('click',function(){
+               var str= $('input.search_txt').val();
+               console.log(str.substr(0,1))
+               $.ajax({
+                   type:	'get',
+                    url:	'http://localhost:8080/api/v1/index/search',
+                   data:	{
+                   type:str.substr(0,1)
+                   },
+                   success:	function(res){
+                       console.log(res)
+                   }
+                   })
+            })
 
         })
 
