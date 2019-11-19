@@ -22,7 +22,7 @@
 
     <!-- 富文本插件 -->
     <!-- <script src="./libs/tinymce/jquery.tinymce.min.js"></script> -->
-    <script src="./libs/tinymce/tinymce.min.js"></script>
+    <script src="./libs/wangEditor.min.js"></script>
 
 </head>
 
@@ -48,7 +48,7 @@
                 </div>
                 <div class="form-group">
                     <label for="inputCategory" class="col-sm-2 control-label">文章类别：</label>
-                    <div class="col-sm-4" id="mySelected">
+                    <div class="col-sm-2" id="mySelected">
                         <select class="form-control category" name="categoryId">
                             <option>类别一</option>
                             <option>类别二</option>
@@ -60,17 +60,27 @@
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label">发布时间：</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-3">
                         <input type="text" class="jeinput" id="testico" name="date" placeholder="YYYY-MM-DD">
-                        <div class="icons jebtns"></div>
+                        <div class="icons jebtns"  onclick="jeDate('#testico',{trigger:false,format: 'YYYY-MM-DD' ,zIndex:20999},   )"></div>
 
                         <!-- <input class="jedatefont  jedate-content" id="ymd01" type="text" placeholder="YYYY年MM月DD日 hh:mm:ss" readonly=""> -->
                     </div>
                 </div>
+                <br> <br>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
-                    <div class="col-sm-10">
-                        <textarea id="mytextarea" name="content">Hello, World!</textarea>
+
+                    <div class="col-sm-8">
+                       
+                        <div id="div1" style="  border: 1px solid #ccc;">
+                            </div>
+                            <div style="padding: 10px 0; color: #ccc">中间隔离带</div>
+                            <div id="editor"  style="  border: 1px solid #ccc; min-height: 300px;">
+                                <p>请输入内容</p>
+                            </div>
+
+
                     </div>
                 </div>
                 <div class="form-group">
@@ -82,6 +92,7 @@
             </form>
         </div>
     </div>
+    <!-- <button id="btn0"> neirong</button> -->
 </body>
 <script src="./libs/http.js"></script>
 <script type="text/html" id='category_temp'>
@@ -95,7 +106,20 @@
     </script>
 
 <script>
+
     $(function () {
+
+        var E = window.wangEditor
+        var editor = new E('#div1','#editor')
+        // 或者 var editor = new E( document.getElementById('editor') )
+        editor.customConfig.uploadImgShowBase64 = true;
+        // editor.customConfig.uploadImgServer = 'http://localhost:8080/api/v1'
+        editor.create()
+        // $('#btn0').click(function () {
+        //     console.log(editor.txt.html())
+        // })
+
+
         // var categoryId=0;
         //加载日期插件
         jeDate('#testico', {
@@ -103,6 +127,7 @@
             theme: { bgcolor: "#00A680", pnColor: "#00DDAA" },//绿色主题
             format: "YYYY-MM-DD",
             isinitVal: true,
+            zIndex:20999,  
         });
         // console.log(window.jeDate)
         $.ajax({
@@ -114,16 +139,11 @@
                 $('div#mySelected').html(temp)
             }
         })
-        // $('#mySelected').on('change', 'select.category', function () {
-        //     // console.log(5555)
-        //     categoryId=$(this).val()
-        //     console.log($(this).val())
-        // })
 
         //已发布按钮
-        submit('btn-fabu','已发布')
+        submit('btn-fabu', '已发布')
         //btn-draft
-        submit('btn-draft','')
+        submit('btn-draft', '')
 
         //图片浏览
         $('input#inputCover').on('change', function () {
@@ -134,48 +154,47 @@
         })
 
 
+
+
+
+        function submit(strName, state) {
+            $('button.' + strName).on('click', function (e) {
+                e.preventDefault();
+                var string = editor.txt.html()
+                console.log(string)
+                var formData = new FormData($('#form')[0]);
+                // for (const iterator of formData) {
+                //     console.log(iterator)
+                // }
+                formData.set('state', state);
+                formData.set('content', string)
+                for (const iterator of formData) {
+                    console.log(iterator)
+                }
+                $.ajax({
+                    type: 'post',
+                    url: bignew.article_publish,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.code == 200) {
+                            alert(res.msg);
+                            // formData.delete('state')
+                            window.location.reload()
+                            // $('#mytextarea').text('')
+
+                        }
+                        console.log(res)
+                    }
+                })
+
+
+            })
+        }
+
     })
 
-    function submit(strName, state) {
-        $('button.'+strName).on('click', function (e) {
-            e.preventDefault();
-            var formData = new FormData($('#form')[0]);
-            // for (const iterator of formData) {
-            //     console.log(iterator)
-            // }
-            formData.append('state', state);
-            $.ajax({
-                type: 'post',
-                url: bignew.article_publish,
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (res) {
-                    if (res.code == 200) {
-                        alert(res.msg);
-                        $('#form')[0].reset();
-                        $('#mytextarea').text('')
-
-                    }
-                    console.log(res)
-                }
-            })
-
-
-        })
-    }
-    tinymce.init({
-        selector: '#mytextarea',
-        height: 400,
-        menubar: false,
-        plugins: [
-            'advlist autolink lists link image charmap print preview anchor',
-            'searchreplace visualblocks code fullscreen',
-            'insertdatetime media table paste code help wordcount'
-        ],
-        toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-
-    });
 
 
 

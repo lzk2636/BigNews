@@ -163,6 +163,7 @@
       </div>
 
     </div>
+    <button id="btn"> 点我</button>
   </div>
 
 
@@ -195,24 +196,26 @@
   //  var currentPage = 1;
   $(function () {
     var currentPage = 1;
-    //初始化代码
-    $.ajax({
-      type: 'get',
-      url: bignew.comment_list,
-      data: {
-        page: currentPage,
-        perpage: 9
-      },
-      success: function (res) {
-        // console.log(res)
-        var temp = template('comment_list', res);
-        // console.log(temp)
-        $('tbody').html(temp);
-        // console.log(res.data.data.totalPage)
-        showPages(res.data.totalPage, currentPage)
-      }
+
+
+
+    getPageTool(1, function (totalPages) {
+      $('#pagination').twbsPagination({
+        totalPages: totalPages,
+        startPage: 1,
+        visiblePages: 10,
+        first: '首页',
+        prev: '上一页',
+        next: '下一页',
+        last: '尾页',
+        onPageClick: function (e, page) {
+          currentPage = page;
+          getPageTool(page, null)
+        }
+      })
     })
-    //删除btn-xs 评论 点击事件
+
+
     $('tbody').on('click', 'a.btn-danger', function () {
       var that = this;
       var id = parseInt($(this).attr('data-id'));
@@ -225,10 +228,12 @@
             id: id
           },
           success: function (res) {
+
             if (res.code == 200) {
-              $(that).parent().parent().remove()
+              getPageTool(currentPage, function (totalPage) {
+                $('#pagination').twbsPagination('changeTotalPages', totalPage, currentPage)
+              })
             }
-            // console.log(res)
           }
         })
 
@@ -236,96 +241,44 @@
 
     })
 
-    //审核通过
-
-    $('tbody').on('click', 'a.btn-info', function () {
-      console.log(this)
-      var that = this;
-      var id = parseInt($(this).attr('data-id'));
-      if (confirm('评论通过吗??')) {
-        $.ajax({
-          type: 'post',
-          url: bignew.comment_pass,
-          data: {
-            id: id
-          },
-          success: function (res) {
-            // console.log(res)
-            //console.log(currentPage)
-            if (res.code == 200) {
-              // window.location.reload()
-          $(that).text('拒绝').addClass('btn-warning').removeClass('btn-info').parent().prev().text('已审核')
-              // $(that).text('拒绝').addClass('btn-reject').removeClass('btn-info').parent()
-            }
-          }
-        })
-      }
-    })
 
 
-
-    $('tbody').on('click', 'a.btn-warning', function () {
-    var that=this;
-      var id = parseInt($(this).attr('data-id'));
-      $.ajax({
-        type: 'post',
-        url: bignew.comment_reject,
-        data: {
-          id: id
-        },
-        success: function (res) {
-          if (res.code == 200) {
-            // window.location.reload()
-            $(that).parent().prev().text('已拒绝')
-           $(that).hide()
-          }
-        }
-      })
-    })
-
-    //当前页
-
-    function pageNum(currentPage) {
-
-      $.ajax({
-        url: bignew.comment_list,
-        data: {
-          page: currentPage,
-          perpage: 9
-        },
-        success: function (res) {
-          var temp = template('comment_list', res);
-          // console.log(temp)
-          $('tbody').html(temp);
-        }
-      })
-      // return currentPage;
-    }
-
-    //分页的封装函数
-    function showPages(totalPages, currentPage) {
-      $('#pagination').twbsPagination('destroy')
-      $('#pagination').twbsPagination({
-        totalPages: totalPages,
-        startPage: currentPage,
-        visiblePages: 10,
-        first: '首页',
-        prev: '上一页',
-        next: '下一页',
-        last: '尾页',
-        onPageClick: function (e, page) {
-          if (page != currentPage) {
-            currentPage = page;
-            pageNum(page)
-          }
-        }
-
-      })
-      return currentPage;
-
-    }
 
   })
+
+
+
+
+
+
+
+
+
+
+
+
+
+  function getPageTool(currentPage, callback) {
+    $.ajax({
+      type: 'get',
+      url: bignew.comment_list,
+      data: {
+        page: currentPage,
+        perpage: 9
+      },
+      success: function (res) {
+        console.log(res)
+        var temp = template('comment_list', res);
+        $('tbody').html(temp);
+
+        if (callback != null &&res.data.data!=0) {
+
+          callback(res.data.totalPage)
+        }
+      }
+    })
+
+  }
 
 
 
