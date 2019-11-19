@@ -22,7 +22,7 @@
 
     <!-- 富文本插件 -->
     <!-- <script src="./libs/tinymce/jquery.tinymce.min.js"></script> -->
-    <script src="./libs/tinymce/tinymce.min.js"></script>
+    <script src="./libs/wangEditor.min.js"></script>
 
 </head>
 
@@ -49,7 +49,7 @@
                 </div>
                 <div class="form-group">
                     <label for="inputCategory" class="col-sm-2 control-label">文章类别：</label>
-                    <div class="col-sm-4" id="mySelected">
+                    <div class="col-sm-2" id="mySelected">
                         <select class="form-control category" name="categoryId">
                             <option>类别一</option>
                             <option>类别二</option>
@@ -61,9 +61,14 @@
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label">发布时间：</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-3">
                         <input type="text" class="jeinput" name='date' id="testico" placeholder="YYYY-MM-DD">
-                        <div class="icons jebtns"></div>
+                        <div class="icons jebtns" onclick="jeDate('#testico', {
+                            trigger: 'click',
+                          
+                            format: 'YYYY-MM-DD',
+                           zIndex:20999
+                        })"></div>
 
                         <!-- <input class="jedatefont  jedate-content" id="ymd01" type="text" placeholder="YYYY年MM月DD日 hh:mm:ss" readonly=""> -->
                     </div>
@@ -71,7 +76,9 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
-                        <textarea id="mytextarea" name="content">Hello, World!</textarea>
+                        <div id="div1">
+                            <p>欢迎使用 wangEditor 编辑器</p>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -95,6 +102,9 @@
         </select>
 </script>
 <script>
+    var E = window.wangEditor;
+    var editor = new E('#div1');
+    editor.create()
     $(function () {
         //加载模板数据
 
@@ -114,7 +124,7 @@
             trigger: 'click',
             theme: { bgcolor: "#00A680", pnColor: "#00DDAA" },//绿色主题
             format: "YYYY-MM-DD",
-            isinitVal: true,
+            zIndex:20999
         });
         // console.log(window.jeDate)
         $.ajax({
@@ -143,7 +153,7 @@
                 $('.article_cover').attr('src', res.data.cover);
                 $('select.category').val(res.data.categoryId);
                 $('#testico').val(res.data.date)
-                $('#mytextarea').text(res.data.content)
+                editor.txt.html(res.data.content)
             }
         })
 
@@ -170,10 +180,11 @@
         $('button.' + strName).on('click', function (e) {
             e.preventDefault();
             var formData = new FormData($('#form')[0]);
-            // for (const iterator of formData) {
-            //     console.log(iterator)
-            // }
+
             formData.append('state', state);
+            // formData.set('state', state);
+            formData.set('content', editor.txt.html())
+
             $.ajax({
                 type: 'post',
                 url: bignew.article_edit,
@@ -185,10 +196,10 @@
                         alert(res.msg);
                         // $('#form')[0].reset();
                         // $('#mytextarea').text('');
-                        window.location.href='./article_list.html'
+                        window.location.href = './article_list.html'
 
                     }
-                    console.log(res)
+                    // console.log(res)
                 }
             })
 
@@ -196,23 +207,6 @@
         })
     }
 
-
-
-    tinymce.init({
-        selector: '#mytextarea',
-        height: 400,
-        menubar: false,
-        plugins: [
-            'advlist autolink lists link image charmap print preview anchor',
-            'searchreplace visualblocks code fullscreen',
-            'insertdatetime media table paste code help wordcount'
-        ],
-        toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-        content_css: [
-            '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-            '//www.tiny.cloud/css/codepen.min.css'
-        ]
-    });
 
 
 
