@@ -74,7 +74,7 @@
         })
         // var json = '{"code":200,"msg":"获取成功","date":[{"date":"2019-05-20","count":23},{"date":"2019-05-21","count":19},{"date":"2019-05-22","count":29},{"date":"2019-05-23","count":24},{"date":"2019-05-24","count":28},{"date":"2019-05-25","count":28},{"date":"2019-05-26","count":19},{"date":"2019-05-27","count":25},{"date":"2019-05-28","count":25}]}';
         // var obj = JSON.parse(json);
-
+        // loadEchars(obj);
 
         function loadEchars(obj) {
             // 基于准备好的dom，初始化echarts实例
@@ -330,11 +330,36 @@
             }
         })
 
+        // xAxis: [
+        //         {
+        //             type: 'category',
+        //             data: ['一月', '二月', '三月', '四月']
+        //         }
+        //     ],
+
         //访问者的数量
+        var months= ['一月', '二月', '三月', '四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
         $.ajax({
             type: 'get',
             url: bignew.data_visit,
             success: function (res) {
+                console.log(res)
+                option2.xAxis[0].data=[]
+             for (const key in res.data) {
+                    var month=key.split('-')[1];
+                    console.log(month);
+                    // if()
+                    option2.xAxis[0].data.push(months[month-1])
+                    for(var i=0;i<option2.xAxis[0].data.length;i++){
+                           if(option2.xAxis[0].data[i]==option2.xAxis[0].data[i+1]){
+                            option2.xAxis[0].data.pop(option2.xAxis[0].data[i])
+                           }
+                    }
+                   
+                    
+                   
+             }
+            //  console.log( option2.series)
                 for (var i = 0; i < option2.series.length; i++) {
                     option2.series[i].data = []
 
@@ -348,13 +373,18 @@
 
 
                 }
-                // console.log(option2)
+                console.log(option2)
 
                 // 使用刚指定的配置项和数据显示图表。
                 myChart2.setOption(option2);
             }
         })
-        myChart2.setOption(option2);
+      
+        // ：/admin/data/category
+      
+      
+      
+        // myChart2.setOption(option2);
     </script>
 
     <script>
