@@ -81,13 +81,14 @@
             </div>
 
             <form action="" class="comment_form">
+                <input type="hidden" name="articleId" id="myId">
                 <div class="form_group">
                     <label>用户名：</label>
-                    <input type="text" placeholder="请输入用户名" class="comment_name">
+                    <input type="text" placeholder="请输入用户名" name='author' class="comment_name">
                 </div>
                 <div class="form_group">
                     <label>评论内容：</label>
-                    <textarea placeholder="请发表您的评论" class="comment_input"></textarea>
+                    <textarea placeholder="请发表您的评论" name="content" class="comment_input"></textarea>
                 </div>
                 <div class="form_group">
                     <input type="submit" name="" value="评 论" class="comment_sub"></div>
@@ -267,10 +268,27 @@
             
             </script>
 
+
+    <!-- 评论列表 -->
+    <script id='comment_list' type="text/html">
+        {{each data v}}
+        <div class="comment_detail_list">
+            <div class="person_pic fl">{{v.author.substr(0,1)}}</div>
+            <div class="name_time fl"><b>{{v.author}}</b>
+                <span>{{v.leaveday}}天{{v.leavehour}}小时前</span></div>
+            <div class="comment_text fl">
+                {{v.content}}
+            </div>
+        </div>
+        {{/each}}
+    </script>
 </body>
 
 <script>
     $(function () {
+        //文章列表id
+        var id = window.location.search.split('=')[1];
+        $('#myId').val(id)
         $.ajax({
 
             type: 'get',
@@ -279,15 +297,15 @@
                 id: window.location.search.split('=')[1]
             },
             success: function (res) {
-                console.log(res)
+              //  console.log(res)
                 $('div.breadcrumb>a').eq(1).text(res.data.category);
                 $('.article_title').text(res.data.title);
                 $('.article_con').html(res.data.content);
-                if (res.data.next == null || res.data.prev == null) {
+
+                $('.article_links>a').eq(0).text(res.data.prev.title).attr('href', './article.html?id=' + res.data.prev.id)
+                if(res.data.next==null){
                     return;
                 }
-                $('.article_links>a').eq(0).text(res.data.prev.title).attr('href', './article.html?id=' + res.data.prev.id)
-
                 $('.article_links>a').eq(1).text(res.data.next.title).attr('href', './article.html?id=' + res.data.next.id)
                 $('.article_info').html(template('info', res))
             }
@@ -310,7 +328,7 @@
             url: 'http://localhost:8080/api/v1/index/rank',
 
             success: function (res) {
-                console.log(res)
+                // console.log(res)
                 $('.common_wrap>ul').html(template('rank', res))
             }
         })
@@ -323,7 +341,7 @@
             success: function (res) {
                 var months = new Date().getMonth() + 1;
                 res.months = months;
-                console.log(res)
+                // console.log(res)
 
                 $('ul.comment_list').html(template('latest_comment', res))
             }
@@ -338,8 +356,51 @@
                 $('.guanzhu_list').html(template('attention', res))  //attention
             }
         })
+        //评论列表
+        $.ajax({
+            type: 'get',
+            url: 'http://localhost:8080/api/v1/index/get_comment',
+            data: {
+                articleId: id//评论文章的id
+            },
+            success: function (res) {
+
+                for (var i = 0; i < res.data.length; i++) {
+                    var times = (new Date().getTime()) - (new Date(res.data[i].date + " " + res.data[i].time).getTime());
+
+                    var leaveday = Math.floor(times / (24 * 3600 * 1000));
+                    var leavehour = Math.floor((times % (24 * 3600 * 1000)) / (3600 * 1000));
+                    res.data[i].leaveday = leaveday;
+                    res.data[i].leavehour = leavehour
+                }
+                $('div.comment_list_con').html(template('comment_list', res))
+            }
+        })
+        $('input.comment_sub').on('click', function (e) {
+            e.preventDefault();
+               var p= $('.comment_form').serialize();
+
+            console.log(p)
+
+            $.ajax({
+                type: 'post',
+                url: 'http://localhost:8080/api/v1/index/post_comment',
+                data: $('.comment_form').serialize(),
+                success: function (res) {
+                   // console.log(res);
+                    if (res.code == 201) {
+                        alert(res.msg);
+                        $('.comment_form')[0].reset();
+                    }else if(res.code==400){
+                        alert(res.msg);
+                        $('.comment_form')[0].reset();
+                    }
+                }
+            })
 
 
+
+        })
     })
 
 </script>

@@ -391,32 +391,10 @@
                     $('.guanzhu_list').html(template('attention', res))  //attention
                 }
             })
-            //文章搜索
-            $.ajax({
-                    type: 'get',
-                    url: bignew.category_list,
-                    success: function (res) {
-                        // console.log(res)
-                        var temp = template('category_temp', res)
-                        $('tbody').html(temp)
-                    }
-                })
+    
 
 
-            $('button.search_btn').on('click',function(){
-               var str= $('input.search_txt').val();
-               console.log(str.substr(0,1))
-               $.ajax({
-                   type:	'get',
-                    url:	'http://localhost:8080/api/v1/index/search',
-                   data:	{
-                   type:str.substr(0,1)
-                   },
-                   success:	function(res){
-                       console.log(res)
-                   }
-                   })
-            })
+          
 
         })
 
