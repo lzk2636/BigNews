@@ -307,7 +307,7 @@
                     return;
                 }
                 $('.article_links>a').eq(1).text(res.data.next.title).attr('href', './article.html?id=' + res.data.next.id)
-                $('.article_info').html(template('info', res))
+                $('div.article_info').html(template('info', res))
             }
 
 
